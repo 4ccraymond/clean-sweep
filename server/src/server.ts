@@ -1,11 +1,14 @@
-const express = require('express');
-const { ApolloServer } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4');
-const db = require('./config/connection');
-const path = require('path');
+import express from 'express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import dotenv from 'dotenv';
+import path from 'path';
 
-const { typeDefs, resolvers } = require('./schemas');
-const { authMiddleware } = require('./utils/auth');
+import db from './config/connection';
+import { typeDefs, resolvers } from './schemas';
+import { authMiddleware } from './utils/auth';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
