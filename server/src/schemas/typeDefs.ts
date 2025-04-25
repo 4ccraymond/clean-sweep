@@ -33,6 +33,15 @@ const typeDefs = gql`
     chore(id: ID!): Chore
     household(id: ID!): Household
   }
+
+  type Mutation {
+    addChore(
+      title: String!
+      description: String
+      assignedTo: ID
+      household: ID!
+    ): Chore
+  }
 `;
 
 export default typeDefs;
