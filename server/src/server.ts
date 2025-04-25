@@ -21,17 +21,24 @@ const startServer = async () => {
 
   await server.start();
 
+  app.get('/', (_req, res) => {
+    res.send('Welcome to the Clean Sweep API! Use /graphql for POST requests.');
+  });
+
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
   // TODO: Restore authMiddleware context once integrated by Stephanie
 
-  // app.use(
-  //   '/graphql',
-  //   expressMiddleware(server, {
-  //     context: authMiddleware,
-  //   })
-  // );
+  app.use(
+    '/graphql',
+    express.json(),
+    expressMiddleware(server, {
+      context: async (ctx: { req: express.Request }) => {
+        return { user: null };
+      },
+    })
+  );
 
   db.once('open', () => {
     app.listen(PORT, () =>
