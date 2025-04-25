@@ -28,7 +28,30 @@ const resolvers = {
     members: async (household: IHousehold) => User.find({ household: household._id }),
     chores: async (household: IHousehold) => Chore.find({ household: household._id }),
   },
-  
+
+  Mutation: {
+    addChore: async (
+      _: any,
+      { 
+        title, 
+        description, 
+        assignedTo, 
+        household 
+      }: { 
+        title: string; 
+        description?: string; 
+        assignedTo?: string; 
+        household: string 
+      }
+    ) => {
+      const newChore = await Chore.create({ title, description, assignedTo, household });
+      await Household.findByIdAndUpdate(household, { 
+        $push: { chores: newChore._id },
+      });
+
+      return newChore;
+    },
+  },
 };
 
 export default resolvers;
