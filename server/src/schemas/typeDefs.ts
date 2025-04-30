@@ -32,6 +32,8 @@ const typeDefs = gql`
     user(id: ID!): User
     chore(id: ID!): Chore
     household(id: ID!): Household
+
+    choreAssignments: [Chore]
   }
 
   type Mutation {
@@ -41,6 +43,47 @@ const typeDefs = gql`
       assignedTo: ID
       household: ID!
     ): Chore
+
+    markChoreCompleted(choreId: ID!, completed: Boolean!): Chore
+
+    assignChore(choreId: ID!, userId: ID!): Chore
+
+    updateChore(
+      choreId: ID!
+      title: String
+      description: String
+      completed: Boolean
+      assignedTo: ID
+    ): Chore
+
+    deleteChore(choreId: ID!): Chore
+
+    unassignChore(choreId: ID!): Chore
+
+    clearCompletedChores: [Chore]
+
+    addUser(
+      username: String!
+      email: String
+      household: ID!
+    ): User
+
+    updateUser(
+      userId: ID!
+      username: String
+      email: String
+      household: ID
+    ): User
+
+    joinHousehold(userId: ID!, householdId: ID!): User
+
+    deleteUser(userId: ID!): User
+
+    addHousehold(name: String!): Household
+
+    updateHousehold(householdId: ID!, name: String): Household
+
+    deleteHousehold(householdId: ID!): Household
   }
 `;
 

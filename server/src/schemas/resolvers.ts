@@ -1,6 +1,8 @@
 import User, {IUser} from '../models/User';
 import Chore, {IChore} from '../models/Chore';
 import Household, {IHousehold} from '../models/Household';
+import { join } from 'path';
+import mongoose, { Types } from 'mongoose';
 
 const resolvers = {
   Query: {
@@ -9,6 +11,9 @@ const resolvers = {
 
     chores: async () => Chore.find({}),
     chore: async (_:any, { id }: { id: string }) => Chore.findById(id),
+    choreAssignments: async () => {
+      return Chore.find({}).populate('assignedTo');
+    }, 
 
     households: async () => Household.find({}),
     household: async (_:any, { id }: { id: string }) => Household.findById(id),
@@ -50,6 +55,275 @@ const resolvers = {
       });
 
       return newChore;
+    },
+
+    markChoreCompleted: async (
+      _: any,
+      { 
+        choreId, 
+        completed 
+      }: { 
+        choreId: string; 
+        completed: boolean 
+      }
+    ) => {
+      const updatedChore = await Chore.findByIdAndUpdate(
+        choreId, 
+        { completed }, 
+        { new: true }
+      );
+
+      return updatedChore;
+    },
+
+    assignChore: async (
+      _: any,
+      { 
+        choreId, 
+        userId 
+      }: { 
+        choreId: string; 
+        userId: string 
+      }
+    ) => {
+      const updatedChore = await Chore.findByIdAndUpdate(
+        choreId, 
+        { assignedTo: userId }, 
+        { new: true }
+      );
+
+      return updatedChore;
+    },
+
+    updateChore: async (
+      _: any,
+      { 
+        choreId, 
+        title, 
+        description, 
+        completed,
+        assignedTo,
+      }: {
+        choreId: string;
+        title?: string;
+        description?: string;
+        completed?: boolean;
+        assignedTo?: string;
+      }
+    ) => {
+      const updates: any = {};
+      if (title !== undefined) updates.title = title;
+      if (description !== undefined) updates.description = description;
+      if (completed !== undefined) updates.completed = completed;
+      if (assignedTo !== undefined) updates.assignedTo = assignedTo;
+
+      const updatedChore = await Chore.findByIdAndUpdate(
+        choreId, 
+        updates, 
+        { new: true }
+      );
+
+      return updatedChore;
+    },
+
+    deleteChore: async (
+      _: any,
+      { choreId }: { choreId: string }
+    ) => {
+      const deletedChore = await Chore.findByIdAndDelete(choreId);
+      if (deletedChore) {
+        await Household.findByIdAndUpdate(deletedChore.household, { 
+          $pull: { chores: choreId },
+        });
+      if (deletedChore.assignedTo) {
+        await User.findByIdAndUpdate(deletedChore.assignedTo, { 
+          $pull: { chores: choreId },
+        });
+      }}
+      else {
+        throw new Error('Chore not found');
+      };
+      
+      return deletedChore;
+    },
+
+    unassignChore: async (
+      _: any,
+      { choreId }: { choreId: string }
+      ) => {
+
+        const chore = await Chore.findById(choreId);
+
+        if (!chore) {
+          throw new Error('Chore not found');
+        }
+
+        if (!chore.assignedTo) {
+          throw new Error('Chore is not assigned to anyone');
+        }
+
+        await User.findByIdAndUpdate(chore.assignedTo, {
+          $pull: { chores: choreId },
+        });
+
+        chore.assignedTo = undefined;
+        await chore.save();
+      
+      return chore;
+    },
+
+    clearCompletedChores: async () => {
+      const completedChores = await Chore.find({ completed: true });
+      
+      for (const chore of completedChores) {
+        await Household.findByIdAndUpdate(chore.household, { 
+          $pull: { chores: chore._id },
+        });
+
+        if (chore.assignedTo) {
+          await User.findByIdAndUpdate(chore.assignedTo, {
+            $pull: { chores: chore._id },
+          });
+        }
+      }
+
+      await Chore.deleteMany({ completed: true });
+
+      return completedChores;
+    },
+
+    addUser: async (
+      _: any,
+       { 
+        username, 
+        email, 
+        household
+      }: {
+        username: string; 
+        email?: string; 
+        household: string 
+      }
+    ) => {
+      const newUser = await User.create({ username, email, household });
+      await Household.findByIdAndUpdate(household, {
+        $push: { members: newUser._id },
+      });
+      return newUser;
+    },
+
+    updateUser: async (
+      _: any,
+      { 
+        userId,
+        username, 
+        email, 
+        household 
+      }: { 
+        userId: string; 
+        username?: string; 
+        email?: string; 
+        household?: string 
+      }
+    ) => {
+      const updates: any = {};
+      if (username !== undefined) updates.username = username;
+      if (email !== undefined) updates.email = email;
+      if (household !== undefined) updates.household = household;
+
+      const updatedUser = await User.findByIdAndUpdate(
+        userId, 
+        updates, 
+        { new: true }
+      );
+
+      return updatedUser;
+    },
+
+    joinHousehold: async (
+      _: any,
+      { userId, householdId }: { userId: string; householdId: string }
+    ) => {
+      const user = await User.findById(userId);
+      const household = await Household.findById(householdId);
+    
+      if (!user || !household) {
+        throw new Error('User or Household not found');
+      }
+    
+      const oldHouseholdId = user.household;
+    
+      user.household = new mongoose.Types.ObjectId(householdId);
+    
+      if (oldHouseholdId) {
+        await Household.findByIdAndUpdate(
+          oldHouseholdId as Types.ObjectId,
+          { $pull: { members: user._id } }
+        );
+      }
+    
+      await Household.findByIdAndUpdate(
+        oldHouseholdId as Types.ObjectId,
+        { $pull: { members: user._id as Types.ObjectId } }
+      );
+            
+      await user.save();
+      await household.save();
+    
+      return user;
+    },
+
+    deleteUser: async (
+      _: any,
+      { userId }: { userId: string }
+    ) => {
+      const deletedUser = await User.findByIdAndDelete(userId);
+      if (deletedUser) {
+        await Household.findByIdAndUpdate(deletedUser.household, { 
+          $pull: { members: userId },
+        });
+      } else {
+        throw new Error('User not found');
+      }
+
+      return deletedUser;
+    },
+
+    addHousehold: async (
+      _: any,
+      { name }: { name: string }
+    ) => {
+      const newHousehold = await Household.create({ name });
+      return newHousehold;
+    },
+
+    updateHousehold: async (
+      _: any,
+      { householdId, name }: { householdId: string; name: string }
+    ) => {
+      const updatedHousehold = await Household.findByIdAndUpdate(
+        householdId, 
+        { name }, 
+        { new: true }
+      );
+
+      return updatedHousehold;
+    },
+
+    deleteHousehold: async (
+      _: any,
+      { householdId }: { householdId: string }
+    ) => {
+      const deletedHousehold = await Household.findByIdAndDelete(householdId);
+      if (deletedHousehold) {
+        await User.updateMany(
+          { household: householdId },
+          { $set: { household: null } }
+        );
+      } else {
+        throw new Error('Household not found');
+      }
+
+      return deletedHousehold;
     },
   },
 };
