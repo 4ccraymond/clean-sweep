@@ -25,6 +25,11 @@ const typeDefs = gql`
     chores: [Chore]
   }
 
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
   type Query {
     users: [User]
     chores: [Chore]
@@ -37,6 +42,12 @@ const typeDefs = gql`
   }
 
   type Mutation {
+  
+    login(
+      email: String!, 
+      password: String!
+      ): AuthPayload
+
     addChore(
       title: String!
       description: String
@@ -65,6 +76,7 @@ const typeDefs = gql`
     addUser(
       username: String!
       email: String
+      password: String!
       household: ID!
     ): User
 

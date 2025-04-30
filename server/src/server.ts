@@ -6,7 +6,7 @@ import path from 'path';
 
 import { typeDefs, resolvers } from './schemas';
 import db from './config/connection';
-// import { authMiddleware } from './utils/auth';
+import { authMiddleware } from './utils/auth';
 
 dotenv.config();
 
@@ -33,9 +33,7 @@ const startServer = async () => {
   app.use(
     '/graphql',
     expressMiddleware(server, {
-      context: async (ctx: { req: express.Request }) => {
-        return { user: null };
-      },
+      context: async ({ req }) => authMiddleware({ req }),
     })
   );
 
