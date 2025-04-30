@@ -1,4 +1,16 @@
 {
+  "name": "chore-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "Server"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace frontend && npm run build --workspace Server",
+    "start": "npm run start --workspace Server"
+  },
+
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
@@ -21,6 +33,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.0"
   },
+  
   "name": "clean-sweep",
   "version": "1.0.0",
   "description": "``` group-project-3 └─ clean-sweep    ├─ client    ├─ README.md    └─ server       ├─ .env       ├─ package-lock.json       ├─ package.json       ├─ src       │  ├─ config       │  │  └─ connection.ts       │  ├─ models       │  │  ├─ Chore.ts       │  │  ├─ Household.ts       │  │  └─ User.ts       │  ├─ schemas       │  │  ├─ index.ts       │  │  ├─ resolvers.ts       │  │  └─ typeDefs.ts       │  ├─ server.ts       │  └─ utils       │     └─ auth.ts       └─ tsconfig.json",
@@ -40,3 +53,5 @@
   },
   "homepage": "https://github.com/4ccraymond/clean-sweep#readme"
 }
+
+
