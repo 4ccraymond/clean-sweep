@@ -1,33 +1,36 @@
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { json } from 'body-parser';
 import dotenv from 'dotenv';
 import db from '../config/connection';
-import typeDefs from '../schema/typeDefs';
-import resolvers from '../schema/resolvers';
+import typeDefs from '../schemas/typeDefs';
+import resolvers from '../schemas/resolvers';
+import {authMiddleware} from '../utils/auth';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3001;
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: ({ req }) => {
-    // optionally add auth logic
-  },
-});
+const startServer = async () => {
+  const app = express();
 
-async function startServer() {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
+
   await server.start();
 
-  const app = express();
-  server.applyMiddleware({ app });
+  app.use('/graphql', json(), expressMiddleware(server, {
+    context: async ({ req }) => authMiddleware,}));
 
   db.once('open', () => {
     app.listen(PORT, () => {
-      console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+      console.log(`Server ready at http://localhost:${PORT}/graphql`);
+
     });
   });
-}
+};
 
 startServer();
