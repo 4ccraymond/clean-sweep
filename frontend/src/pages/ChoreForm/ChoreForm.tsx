@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
-const Container = styled.div`
+const FormContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  padding: 2rem;
   background: ${({ theme }) => theme.colors.bg};
 `;
 
@@ -38,37 +38,29 @@ const Button = styled.button`
   }
 `;
 
-export default function Login() {
+export default function ChoreForm() {
   return (
-    <Container>
+    <FormContainer>
       <Form>
-        <h2>Login</h2>
-        <Input type="email" placeholder="Email" />
-        <Input type="password" placeholder="Password" />
-        <Button type="submit">Login</Button>
+        <h2>Create New Chore</h2>
+        <Input type="text" placeholder="Chore Name" />
+        <Input type="text" placeholder="Assigned to" />
+        <Button type="submit">Create Chore</Button>
       </Form>
-    </Container>
+    </FormContainer>
   );
 }
-// This is a simple login form using styled-components for styling.
-// It includes a container for centering the form, a form element, input fields for email and password, and a submit button.
+// This is a simple chore creation form using styled-components for styling.
+// It includes a container for centering the form, a form element, input fields for chore name and assigned person, and a submit button.
 // The form is styled with a white background, padding, border-radius, and box-shadow for a card-like appearance.
 // The input fields and button are styled for a consistent look and feel.
 // The button changes color on hover for better user experience.
 // The form is responsive and will adjust to different screen sizes due to the use of flexbox in the container.
-// The theme colors are used for consistency across the application.
 
-//mobile responsive
-const MobileContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: ${({ theme }) => theme.colors.bg};
-  padding: 1rem;
-`;
+//mobile responsive design
+// Removed duplicate declaration of FormContainer
 
-const MobileForm = styled.form`
+const ResponsiveForm = styled.form`
   background: white;
   padding: 2rem;
   border-radius: 12px;
