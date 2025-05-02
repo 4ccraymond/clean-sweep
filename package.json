@@ -6,11 +6,11 @@
   "main": "index.js",
   "workspaces": [
     "frontend",
-    "Server"
+    "server"
   ],
   "scripts": {
-    "build": "npm run build --workspace frontend && npm run build --workspace Server",
-    "start": "npm run start --workspace Server",
+    "build": "npm run build --workspace frontend && npm run build --workspace server",
+    "start": "npm run start --workspace server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -47,18 +47,5 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.0",
     "styled-components": "^6.1.17"
-  },
-  "description": "``` group-project-3 └─ clean-sweep    ├─ client    ├─ README.md    └─ server       ├─ .env       ├─ package-lock.json       ├─ package.json       ├─ src       │  ├─ config       │  │  └─ connection.ts       │  ├─ models       │  │  ├─ Chore.ts       │  │  ├─ Household.ts       │  │  └─ User.ts       │  ├─ schemas       │  │  ├─ index.ts       │  │  ├─ resolvers.ts       │  │  └─ typeDefs.ts       │  ├─ server.ts       │  └─ utils       │     └─ auth.ts       └─ tsconfig.json",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/4ccraymond/clean-sweep.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/4ccraymond/clean-sweep/issues"
-  },
-  "homepage": "https://github.com/4ccraymond/clean-sweep#readme"
+  }
 }
