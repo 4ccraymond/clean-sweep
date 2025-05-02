@@ -8,6 +8,14 @@ import { createBrowserRouter } from 'react-router-dom'
 import Login from './pages/Login/Login.tsx'
 import Dashboard from './pages/Dashboard/Dashboard.tsx'
 import Signup from './pages/Signup/Signup.tsx'
+// import { GlobalStyle } from './styles/globalStyles.tsx'
+// import { theme } from './styles/globalStyles.tsx'
+// import { ThemeProvider } from 'styled-components';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ThemeProvider } from 'styled-components';
+import { GlobalStyle, theme } from './styles/globalStyles';
+// Removed duplicate import of App
 
 const router = createBrowserRouter([
   {
@@ -40,3 +48,12 @@ if (rootElement) {
     </StrictMode>
   );
 }
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>
+);

@@ -31,6 +31,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^22.15.3",
+    "@types/styled-components": "^5.1.34",
     "nodemon": "^3.1.10",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
@@ -44,6 +45,20 @@
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.14.0"
-  }
+    "mongoose": "^8.14.0",
+    "styled-components": "^6.1.17"
+  },
+  "description": "``` group-project-3 └─ clean-sweep    ├─ client    ├─ README.md    └─ server       ├─ .env       ├─ package-lock.json       ├─ package.json       ├─ src       │  ├─ config       │  │  └─ connection.ts       │  ├─ models       │  │  ├─ Chore.ts       │  │  ├─ Household.ts       │  │  └─ User.ts       │  ├─ schemas       │  │  ├─ index.ts       │  │  ├─ resolvers.ts       │  │  └─ typeDefs.ts       │  ├─ server.ts       │  └─ utils       │     └─ auth.ts       └─ tsconfig.json",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4ccraymond/clean-sweep.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/4ccraymond/clean-sweep/issues"
+  },
+  "homepage": "https://github.com/4ccraymond/clean-sweep#readme"
 }

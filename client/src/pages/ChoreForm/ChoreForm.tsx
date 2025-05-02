@@ -1,18 +1,10 @@
-export default function Signup() {
-    return (
-        <p>
-            Signup
-        </p>
-    )
-}
-
 import styled from 'styled-components';
 
-const Container = styled.div`
+const FormContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  padding: 2rem;
   background: ${({ theme }) => theme.colors.bg};
 `;
 
@@ -46,17 +38,15 @@ const Button = styled.button`
   }
 `;
 
-export default function Signup() {
+export default function ChoreForm() {
   return (
-    <Container>
+    <FormContainer>
       <Form>
-        <h2>Signup</h2>
-        <Input type="text" placeholder="Username" />
-        <Input type="email" placeholder="Email" />
-        <Input type="password" placeholder="Password" />
-        <Input type="password" placeholder="Confirm Password" />
-        <Button type="submit">Signup</Button>
+        <h2>Create New Chore</h2>
+        <Input type="text" placeholder="Chore Name" />
+        <Input type="text" placeholder="Assigned to" />
+        <Button type="submit">Create Chore</Button>
       </Form>
-    </Container>
+    </FormContainer>
   );
 }
