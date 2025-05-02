@@ -3,6 +3,7 @@ import Chore, {IChore} from '../models/Chore';
 import Household, {IHousehold} from '../models/Household';
 import { join } from 'path';
 import mongoose, { Types } from 'mongoose';
+import { signToken } from '../utils/auth';
 
 const resolvers = {
   Query: {
@@ -35,6 +36,26 @@ const resolvers = {
   },
 
   Mutation: {
+    login: async (
+      _: any,
+      { email, password }: { email: string; password: string }
+    ) => {
+      const user = await User.findOne({ email });
+    
+      if (!user || !user.email) {
+        throw new Error('User not found');
+      }
+    
+      const isValid = await user.isCorrectPassword(password);
+      if (!isValid) {
+        throw new Error('Incorrect password');
+      }
+    
+      const token = signToken({ email: user.email, userName: user.username });
+    
+      return { token, user };
+    },
+
     addChore: async (
       _: any,
       { 
@@ -197,14 +218,16 @@ const resolvers = {
        { 
         username, 
         email, 
+        password,
         household
       }: {
         username: string; 
         email?: string; 
+        password: string;
         household: string 
       }
     ) => {
-      const newUser = await User.create({ username, email, household });
+      const newUser = await User.create({ username, email, password, household });
       await Household.findByIdAndUpdate(household, {
         $push: { members: newUser._id },
       });

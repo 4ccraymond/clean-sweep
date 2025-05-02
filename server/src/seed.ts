@@ -21,11 +21,11 @@ const seedData = async () => {
 
     // Create users
     const [alice, bob, charlie, daisy] = await User.insertMany([
-      { username: 'alice', email: 'alice@example.com', household: household._id },
-      { username: 'bob', email: 'bob@example.com', household: household._id },
-      { username: 'charlie', household: household._id },
-      { username: 'daisy', household: household._id },
-    ]);
+      { username: 'alice', email: 'alice@example.com', password: 'password123', household: household._id },
+      { username: 'bob', email: 'bob@example.com', password: 'password123', household: household._id },
+      { username: 'charlie', password: 'password123', household: household._id },
+      { username: 'daisy', password: 'password123', household: household._id },
+    ]);    
 
     // Create chores
     const chores = await Chore.insertMany([

@@ -2,13 +2,28 @@
   "name": "clean-sweep",
   "version": "1.0.0",
   "private": true,
+  "description": "``` group-project-3 └─ clean-sweep    ├─ client    ├─ README.md    └─ server       ├─ .env       ├─ package-lock.json       ├─ package.json       ├─ src       │  ├─ config       │  │  └─ connection.ts       │  ├─ models       │  │  ├─ Chore.ts       │  │  ├─ Household.ts       │  │  └─ User.ts       │  ├─ schemas       │  │  ├─ index.ts       │  │  ├─ resolvers.ts       │  │  └─ typeDefs.ts       │  ├─ server.ts       │  └─ utils       │     └─ auth.ts       └─ tsconfig.json",
+  "main": "index.js",
   "workspaces": [
     "frontend",
     "Server"
   ],
   "scripts": {
+    "build": "npm run build --workspace frontend && npm run build --workspace Server",
+    "start": "npm run start --workspace Server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4ccraymond/clean-sweep.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/4ccraymond/clean-sweep/issues"
+  },
+  "homepage": "https://github.com/4ccraymond/clean-sweep#readme",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
