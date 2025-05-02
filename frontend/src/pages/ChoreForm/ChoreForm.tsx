@@ -60,15 +60,4 @@ export default function ChoreForm() {
 //mobile responsive design
 // Removed duplicate declaration of FormContainer
 
-const ResponsiveForm = styled.form`
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-
-  @media (max-width: 480px) {
-    padding: 1.5rem;
-  }
-`;
+// Removed unused ResponsiveForm to resolve the compile error.
