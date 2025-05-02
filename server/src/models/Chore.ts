@@ -6,6 +6,8 @@ export interface IChore extends Document {
   completed: boolean;
   assignedTo?: Types.ObjectId;
   household: Types.ObjectId;
+  repeatEvery?: number;
+  lastCompleted?: Date;
 }
 
 const choreSchema = new Schema<IChore>({
@@ -27,6 +29,15 @@ const choreSchema = new Schema<IChore>({
     type: Schema.Types.ObjectId,
     ref: 'Household',
     required: true,
+  },
+  repeatEvery: {
+    type: Number,
+    required: false,
+    min: 1,
+  },
+  lastCompleted: {
+    type: Date,
+    required: false,
   },
 });
 

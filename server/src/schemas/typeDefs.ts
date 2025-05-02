@@ -16,6 +16,8 @@ const typeDefs = gql`
     completed: Boolean!
     assignedTo: User
     household: Household
+    repeatEvery: Int
+    lastCompleted: String
   }
 
   type Household {
@@ -53,6 +55,8 @@ const typeDefs = gql`
       description: String
       assignedTo: ID
       household: ID!
+      repeatEvery: Int
+      lastCompleted: String
     ): Chore
 
     markChoreCompleted(choreId: ID!, completed: Boolean!): Chore
@@ -65,6 +69,8 @@ const typeDefs = gql`
       description: String
       completed: Boolean
       assignedTo: ID
+      repeatEvery: Int
+      lastCompleted: String
     ): Chore
 
     deleteChore(choreId: ID!): Chore
@@ -72,6 +78,8 @@ const typeDefs = gql`
     unassignChore(choreId: ID!): Chore
 
     clearCompletedChores: [Chore]
+
+    resetRecurringChores: [Chore]
 
     addUser(
       username: String!

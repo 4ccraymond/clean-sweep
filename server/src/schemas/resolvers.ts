@@ -62,15 +62,26 @@ const resolvers = {
         title, 
         description, 
         assignedTo, 
-        household 
+        household,
+        repeatEvery,
+        lastCompleted, 
       }: { 
         title: string; 
         description?: string; 
         assignedTo?: string; 
-        household: string 
+        household: string;
+        repeatEvery?: number;
+        lastCompleted?: string;
       }
     ) => {
-      const newChore = await Chore.create({ title, description, assignedTo, household });
+      const newChore = await Chore.create({ 
+        title, 
+        description, 
+        assignedTo, 
+        household,
+        repeatEvery,
+        lastCompleted: lastCompleted ? new Date(lastCompleted): undefined,
+      });
       await Household.findByIdAndUpdate(household, { 
         $push: { chores: newChore._id },
       });
@@ -88,9 +99,14 @@ const resolvers = {
         completed: boolean 
       }
     ) => {
+      const updates: any = { completed};
+      if (completed) {
+        updates.lastCompleted = new Date();
+      }
+
       const updatedChore = await Chore.findByIdAndUpdate(
         choreId, 
-        { completed }, 
+        updates,
         { new: true }
       );
 
@@ -124,12 +140,16 @@ const resolvers = {
         description, 
         completed,
         assignedTo,
+        repeatEvery,
+        lastCompleted,
       }: {
         choreId: string;
         title?: string;
         description?: string;
         completed?: boolean;
         assignedTo?: string;
+        repeatEvery?: number;
+        lastCompleted?: string;
       }
     ) => {
       const updates: any = {};
@@ -137,6 +157,8 @@ const resolvers = {
       if (description !== undefined) updates.description = description;
       if (completed !== undefined) updates.completed = completed;
       if (assignedTo !== undefined) updates.assignedTo = assignedTo;
+      if (repeatEvery !== undefined) updates.repeatEvery = repeatEvery;
+      if (lastCompleted !== undefined) updates.lastCompleted = new Date (lastCompleted);
 
       const updatedChore = await Chore.findByIdAndUpdate(
         choreId, 
@@ -213,6 +235,31 @@ const resolvers = {
       return completedChores;
     },
 
+    resetRecurringChores: async () => {
+      const now = new Date();
+    
+      const chores = await Chore.find({
+        repeatEvery: { $exists: true },
+        lastCompleted: { $exists: true },
+        completed: true,
+      });
+    
+      const resetChores: IChore[] = [];
+    
+      for (const chore of chores) {
+        const daysSinceLast =
+          (now.getTime() - new Date(chore.lastCompleted!).getTime()) / (1000 * 60 * 60 * 24);
+    
+        if (daysSinceLast >= (chore.repeatEvery || 0)) {
+          chore.completed = false;
+          await chore.save();
+          resetChores.push(chore);
+        }
+      }
+    
+      return resetChores.sort((a, b) => a.title.localeCompare(b.title));
+    },    
+
     addUser: async (
       _: any,
        { 
@@ -283,11 +330,6 @@ const resolvers = {
           { $pull: { members: user._id } }
         );
       }
-    
-      await Household.findByIdAndUpdate(
-        oldHouseholdId as Types.ObjectId,
-        { $pull: { members: user._id as Types.ObjectId } }
-      );
             
       await user.save();
       await household.save();
