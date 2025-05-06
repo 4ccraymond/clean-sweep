@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -39,44 +41,55 @@ const Button = styled.button`
 `;
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('household', data.user.household?._id || '');
+        navigate('/dashboard');
+      } else {
+        alert(data.msg || 'Login failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
+    }
+  };
+
   return (
     <Container>
-      <Form>
+      <Form onSubmit={handleLogin}>
         <h2>Login</h2>
-        <Input type="email" placeholder="Email" />
-        <Input type="password" placeholder="Password" />
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
         <Button type="submit">Login</Button>
       </Form>
     </Container>
   );
 }
-// This is a simple login form using styled-components for styling.
-// It includes a container for centering the form, a form element, input fields for email and password, and a submit button.
-// The form is styled with a white background, padding, border-radius, and box-shadow for a card-like appearance.
-// The input fields and button are styled for a consistent look and feel.
-// The button changes color on hover for better user experience.
-// The form is responsive and will adjust to different screen sizes due to the use of flexbox in the container.
-// The theme colors are used for consistency across the application.
-
-//mobile responsive
-const MobileContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: ${({ theme }) => theme.colors.bg};
-  padding: 1rem;
-`;
-
-const MobileForm = styled.form`
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-
-  @media (max-width: 480px) {
-    padding: 1.5rem;
-  }
-`;
