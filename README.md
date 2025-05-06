@@ -89,3 +89,4 @@ Both frontend and backend are deployed on [Render](https://render.com). Separate
 ## License
 
 This project is for educational purposes.
+
