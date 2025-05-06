@@ -23,7 +23,7 @@ const startServer = async () => {
   await server.start();
 
   app.use('/graphql', json(), expressMiddleware(server, {
-    context: async ({ req }) => authMiddleware,}));
+    context: async ({ req }) => authMiddleware({ req })}));
 
   db.once('open', () => {
     app.listen(PORT, () => {

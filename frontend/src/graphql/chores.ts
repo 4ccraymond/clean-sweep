@@ -66,3 +66,4 @@ export const DELETE_CHORE = gql`
     }
   }
 `;
+ 
