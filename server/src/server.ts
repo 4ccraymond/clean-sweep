@@ -3,10 +3,13 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import dotenv from 'dotenv';
 import path from 'path';
+import cors from 'cors';
 
 import { typeDefs, resolvers } from './schemas';
 import db from './config/connection';
 import { authMiddleware } from './utils/auth';
+import authRoutes from './routes/authRoutes';
+
 
 dotenv.config();
 
@@ -21,6 +24,11 @@ const startServer = async () => {
 
   await server.start();
 
+  app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }));
+
   app.get('/', (_req, res) => {
     res.send('Welcome to the Clean Sweep API! Use /graphql for POST requests.');
   });
@@ -28,7 +36,7 @@ const startServer = async () => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  // TODO: Restore authMiddleware context once integrated by Stephanie
+  app.use('/api/auth', authRoutes);
 
   app.use(
     '/graphql',
@@ -43,13 +51,5 @@ const startServer = async () => {
     );
   });
 };
-
-// Serve static files from the React app (frontend) UNCOMMENT when ready
-// app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-// For any request that doesn’t match a backend route, serve the React app
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-// });
 
 startServer();
