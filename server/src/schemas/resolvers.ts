@@ -85,8 +85,14 @@ const resolvers = {
         throw new Error('Incorrect password');
       }
     
-      const token = signToken({ email: user.email, userName: user.username });
-    
+      const token = signToken({
+        _id: user._id.toString(),
+        email: user.email,
+        username: user.username,
+        household: user.household?.toString(),
+      });
+      
+
       return { token, user };
     },
 

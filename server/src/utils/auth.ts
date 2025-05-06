@@ -18,41 +18,58 @@ export interface AuthContext {
     user: AuthUser | null;
 }
 
-export function signToken(user: AuthUser) {
-    return jwt.sign({ data: user }, secret, {expiresIn: expiration});
+export function signToken(user: {
+  _id: string;
+  email: string;
+  username?: string;
+  household?: string;
+}) {
+  return jwt.sign(
+    {
+      userId: user._id,
+      email: user.email,
+      username: user.username,
+      household: user.household,
+    },
+    secret,
+    { expiresIn: expiration }
+  );
 }
 
 export async function authMiddleware({ req }: { req: Request }): Promise<AuthContext> {
-    let token = req.headers.authorization || ''; 
+  let token = req.headers.authorization || ''; 
 
-    if (token.startsWith('Bearer ')) {
+  if (token.startsWith('Bearer ')) {
     token = token.slice(7).trim();
   }
 
-    if (!token) {
+  if (!token) {
     return { user: null };
   }
 
   try {
-    const decoded = jwt.verify(token, secret) as {data: AuthUser};
-    
-    const user = await User.findOne({ email: decoded.data.email }).lean() as {
+    const decoded = jwt.verify(token, secret) as {
+      userId: string;
       email: string;
       username?: string;
-      household?: any;
-    } | null;
-
-    if (!user) return { user: null };
-    return { 
-      user: {
-        email: user.email,
-        userName: user.username,
-        household: user.household?.toString()
-      }
+      household?: string;
     };
-  
-  } catch (error) {
-      console.error('Invalid:', error);
+
+    if (!decoded.email || !decoded.userId) {
+      console.error('Invalid token format:', decoded);
       return { user: null };
+    }
+
+    return {
+      user: {
+        email: decoded.email,
+        userName: decoded.username,
+        household: decoded.household,
+      },
+    };
+
+  } catch (error) {
+    console.error('Invalid token:', error);
+    return { user: null };
   }
 }
