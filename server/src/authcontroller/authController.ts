@@ -4,7 +4,7 @@ import User from '../models/User';
 import generateToken from '../utils/generateToken';
 
 export const signup = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
     let user = await User.findOne({ email });
@@ -13,7 +13,7 @@ export const signup = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    user = new User({ name, email, password: hashedPassword });
+    user = new User({ username, email, password: hashedPassword });
     await user.save();
 
     const token = generateToken(user._id.toString());
@@ -21,7 +21,7 @@ export const signup = async (req: Request, res: Response) => {
     res.status(201).json({ token });
   } catch (error) {
     console.error((error as Error).message);
-    res.status(500).send('Server Error');
+    res.status(500).send('Oh No! Server Error');
   }
 };
 
@@ -40,6 +40,6 @@ export const login = async (req: Request, res: Response) => {
     res.json({ token });
   } catch (error) {
     console.error((error as Error).message);
-    res.status(500).send('Server Error');
+    res.status(500).send(':( Server Error');
   }
 };
