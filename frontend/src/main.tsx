@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 // import App from './App.tsx'
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider, BrowserRouter } from 'react-router-dom'
 import { createBrowserRouter } from 'react-router-dom'
 // import { ChakraProvider } from '@chakra-ui/react';
 import Login from './pages/Login/Login.tsx'
