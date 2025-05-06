@@ -2,7 +2,13 @@ import ReactDOM from 'react-dom/client';
 import { StrictMode } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink,
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 
 import App from './App';
 import Login from './pages/Login/Login';
@@ -11,17 +17,30 @@ import Signup from './pages/Signup/Signup';
 import { GlobalStyle, theme } from './styles/globalStyles';
 import ChoreForm from './pages/ChoreForm/ChoreForm';
 
-const client = new ApolloClient({
+// Apollo setup with dynamic token injection
+const httpLink = createHttpLink({
   uri: 'http://localhost:3001/graphql',
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('token');
+  console.log('Sending token:', token);
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
-  headers: {
-    authorization: `Bearer ${localStorage.getItem('token') || ''}`
-  }
 });
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       { index: true, element: <Login /> },
@@ -29,9 +48,8 @@ const router = createBrowserRouter([
       { path: '/signup', element: <Signup /> },
       { path: '/dashboard', element: <Dashboard /> },
       { path: '/chore-form', element: <ChoreForm /> },
-
-    ]
-  }
+    ],
+  },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
