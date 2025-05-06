@@ -8,9 +8,10 @@ dotenv.config();
 const secret = process.env.JWT_SECRET || 'Clean-sweep';
 const expiration = '1h';
 
-interface AuthUser {
+export interface AuthUser {
     email: string;
     userName?: string;
+    household?: string;
 }
 
 export interface AuthContext {
@@ -21,7 +22,7 @@ export function signToken(user: AuthUser) {
     return jwt.sign({ data: user }, secret, {expiresIn: expiration});
 }
 
-export function authMiddleware({ req }: { req: Request }): Promise<AuthContext> {
+export async function authMiddleware({ req }: { req: Request }): Promise<AuthContext> {
     let token = req.headers.authorization || ''; 
 
     if (token.startsWith('Bearer ')) {
@@ -35,12 +36,23 @@ export function authMiddleware({ req }: { req: Request }): Promise<AuthContext> 
   try {
     const decoded = jwt.verify(token, secret) as {data: AuthUser};
     
-    const user = await User.findOne({ email: decoded.data.email }). lean ();
+    const user = await User.findOne({ email: decoded.data.email }).lean() as {
+      email: string;
+      username?: string;
+      household?: any;
+    } | null;
 
     if (!user) return { user: null };
-    return { user };
+    return { 
+      user: {
+        email: user.email,
+        userName: user.username,
+        household: user.household?.toString()
+      }
+    };
   
   } catch (error) {
-      console.error('Invalid:')
+      console.error('Invalid:', error);
+      return { user: null };
   }
 }
