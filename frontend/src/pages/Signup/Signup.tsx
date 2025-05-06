@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -39,22 +41,51 @@ const Button = styled.button`
 `;
 
 export default function Signup() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== confirm) {
+      alert("Passwords don't match");
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: username, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        navigate('/dashboard');
+      } else {
+        alert(data.msg || 'Signup failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
+    }
+  };
+
   return (
     <Container>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <h2>Signup</h2>
-        <Input type="text" placeholder="Username" />
-        <Input type="email" placeholder="Email" />
-        <Input type="password" placeholder="Password" />
-        <Input type="password" placeholder="Confirm Password" />
+        <Input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+        <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+        <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+        <Input type="password" placeholder="Confirm Password" value={confirm} onChange={e => setConfirm(e.target.value)} />
         <Button type="submit">Signup</Button>
       </Form>
     </Container>
   );
 }
-// This is a simple signup form using styled-components for styling.   
-// It includes a container for centering the form, a form element, input fields for username, email, password, and confirm password, and a submit button.
-// The form is styled with a white background, padding, border-radius, and box-shadow for a card-like appearance.
-// The input fields and button are styled for a consistent look and feel.
-// The button changes color on hover for better user experience.
-// The form is responsive and will adjust to different screen sizes due to the use of flexbox in the container.
