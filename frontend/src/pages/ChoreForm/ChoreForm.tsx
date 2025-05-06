@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import styled from 'styled-components';
+import { useMutation } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
+import { ADD_CHORE, GET_CHORES } from '../../graphql/chores';
 
 const FormContainer = styled.div`
   display: flex;
@@ -39,25 +43,65 @@ const Button = styled.button`
 `;
 
 export default function ChoreForm() {
+  const [title, setTitle] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+  const [description, setDescription] = useState('');
+  const navigate = useNavigate();
+
+  const householdId = localStorage.getItem('household'); // Stored at signup/login
+
+  const [addChore] = useMutation(ADD_CHORE, {
+    refetchQueries: [{ query: GET_CHORES }],
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!householdId) {
+      alert('No household found. Please log in again.');
+      return;
+    }
+
+    try {
+      await addChore({
+        variables: {
+          title,
+          household: householdId,
+          assignedTo: assignedTo || undefined,
+          description: description || undefined,
+        },
+      });
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error adding chore:', err);
+    }
+  };
+
   return (
     <FormContainer>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <h2>Create New Chore</h2>
-        <Input type="text" placeholder="Chore Name" />
-        <Input type="text" placeholder="Assigned to" />
+        <Input
+          type="text"
+          placeholder="Chore Name"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          required
+        />
+        <Input
+          type="text"
+          placeholder="Assigned to (User ID)"
+          value={assignedTo}
+          onChange={e => setAssignedTo(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Description (optional)"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
         <Button type="submit">Create Chore</Button>
       </Form>
     </FormContainer>
   );
 }
-// This is a simple chore creation form using styled-components for styling.
-// It includes a container for centering the form, a form element, input fields for chore name and assigned person, and a submit button.
-// The form is styled with a white background, padding, border-radius, and box-shadow for a card-like appearance.
-// The input fields and button are styled for a consistent look and feel.
-// The button changes color on hover for better user experience.
-// The form is responsive and will adjust to different screen sizes due to the use of flexbox in the container.
-
-//mobile responsive design
-// Removed duplicate declaration of FormContainer
-
-// Removed unused ResponsiveForm to resolve the compile error.

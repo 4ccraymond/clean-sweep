@@ -64,8 +64,9 @@ export default function Signup() {
 
       const data = await res.json();
 
-      if (res.ok && data.token) {
+      if (res.ok && data.token && data.user) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('household', data.user.household?._id || '');
         navigate('/dashboard');
       } else {
         alert(data.msg || 'Signup failed');
@@ -80,10 +81,34 @@ export default function Signup() {
     <Container>
       <Form onSubmit={handleSubmit}>
         <h2>Signup</h2>
-        <Input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-        <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-        <Input type="password" placeholder="Confirm Password" value={confirm} onChange={e => setConfirm(e.target.value)} />
+        <Input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          required
+        />
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirm}
+          onChange={e => setConfirm(e.target.value)}
+          required
+        />
         <Button type="submit">Signup</Button>
       </Form>
     </Container>
