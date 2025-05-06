@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request } from 'express';
 import dotenv from 'dotenv';
+import User from '../models/User';
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ export function signToken(user: AuthUser) {
     return jwt.sign({ data: user }, secret, {expiresIn: expiration});
 }
 
-export function authMiddleware({ req }: { req: Request }): AuthContext {
+export function authMiddleware({ req }: { req: Request }): Promise<AuthContext> {
     let token = req.headers.authorization || ''; 
 
     if (token.startsWith('Bearer ')) {
@@ -34,10 +35,12 @@ export function authMiddleware({ req }: { req: Request }): AuthContext {
   try {
     const decoded = jwt.verify(token, secret) as {data: AuthUser};
     
-    return { user: decoded.data };
+    const user = await User.findOne({ email: decoded.data.email }). lean ();
+
+    if (!user) return { user: null };
+    return { user };
+  
   } catch (error) {
-    
-    console.error('Invalid Token:', error);
-    return { user: null };
+      console.error('Invalid:')
   }
 }
