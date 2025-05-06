@@ -1,57 +1,32 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-// import App from './App.tsx'
-import { RouterProvider } from 'react-router-dom'
-import { createBrowserRouter } from 'react-router-dom'
-// import { ChakraProvider } from '@chakra-ui/react';
-import Login from './pages/Login/Login.tsx'
-import Dashboard from './pages/Dashboard/Dashboard.tsx'
-import Signup from './pages/Signup/Signup.tsx'
-// css in js
-import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { StrictMode } from 'react';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { GlobalStyle, theme } from './styles/globalStyles.ts';
+
 import App from './App';
+import Login from './pages/Login/Login';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Signup from './pages/Signup/Signup';
+import { GlobalStyle, theme } from './styles/globalStyles';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App/>,
+    element: <App />,
     children: [
-      {
-        index: true,
-        element: <Login/>
-      },
-      {
-        path: '/dashboard',
-        element: <Dashboard/>
-      },
-      {
-        path: '/signup',
-        element: <Signup/>
-      }
+      { index: true, element: <Login /> },
+      { path: '/dashboard', element: <Dashboard /> },
+      { path: '/signup', element: <Signup /> }
     ]
   }
 ]);
 
-const rootElement = document.getElementById('root');
-if (rootElement) {
-  createRoot(rootElement).render(
-    <StrictMode>
-      {/* <ChakraProvider> */}
-        <RouterProvider router={router}/>
-      {/* </ChakraProvider> */}
-    </StrictMode>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(
+  <StrictMode>
     <ThemeProvider theme={theme}>
-      {GlobalStyle()}
-      <App />
+      <GlobalStyle />
+      <RouterProvider router={router} />
     </ThemeProvider>
-  </React.StrictMode>
+  </StrictMode>
 );
