@@ -3,22 +3,56 @@ import Chore, {IChore} from '../models/Chore';
 import Household, {IHousehold} from '../models/Household';
 import { join } from 'path';
 import mongoose, { Types } from 'mongoose';
-import { signToken } from '../utils/auth';
+import { AuthContext, signToken } from '../utils/auth';
 
 const resolvers = {
   Query: {
-    users: async () => User.find({}),
-    user: async (_:any, { id }: { id: string }) => User.findById(id),
+    users: async (parent: any, _: any, context: AuthContext) => {
+      if (!context.user) throw new Error ('Must be logged in');
+      return User.find({ household: context.user.household });
+    },
 
-    chores: async () => Chore.find({}),
-    chore: async (_:any, { id }: { id: string }) => Chore.findById(id),
-    choreAssignments: async () => {
-      return Chore.find({}).populate('assignedTo');
-    }, 
+    user: async (_: any, {id}: { id: string }, context: AuthContext) => {
+      if (!context.user) throw new Error ('must be logged in');
+      const user = await User.findById(id);
+      if (!user || user.household?.toString() !==  context.user.household) {
+        throw new Error ('Access Denied');
+      }
+      return user;
+    },
 
-    households: async () => Household.find({}),
-    household: async (_:any, { id }: { id: string }) => Household.findById(id),
-  },
+    chores: async (parent: any, _: any, context: AuthContext) => {
+      if (!context.user) throw new Error ('Must be logged in');
+      return Chore.find({ household: context.user.household });
+    },
+
+    chore: async (_: any, {id}: { id: string }, context: AuthContext) => {
+      if (!context.user) throw new Error ('must be logged in');
+      const chore = await Chore.findById(id);
+      if (!chore || chore.household?.toString() !==  context.user.household) {
+        throw new Error ('Access Denied');
+      }
+      return chore;
+    },
+
+    choreAssignments: async (parent: any, _: any, context: AuthContext) => {
+      if (!context.user) throw new Error ('Must be logged in');
+      return Chore.find({ household: context.user.household }).populate('assignedTo');
+    },
+
+    households: async (parent: any, _: any, context: AuthContext) => {
+      if (!context.user) throw new Error ('Must be logged in');
+      return Household.find({ _id: context.user.household });
+    },
+
+    household: async (_: any, {id}: { id: string }, context: AuthContext) => {
+      if (!context.user) throw new Error ('must be logged in');
+      if (id !== context.user.household) {
+        throw new Error ('Access denied');
+      }
+      return Household.findById(id);
+      },
+    },
 
   User: {
     chores: async (user: IUser) => Chore.find({ assignedTo: user._id }),
@@ -72,8 +106,12 @@ const resolvers = {
         household: string;
         repeatEvery?: number;
         lastCompleted?: string;
-      }
+      },
+      context: AuthContext
     ) => {
+      if (!context.user) {
+        throw new Error ('Must be logged in');
+      } 
       const newChore = await Chore.create({ 
         title, 
         description, 
@@ -117,12 +155,18 @@ const resolvers = {
       _: any,
       { 
         choreId, 
-        userId 
+        userId
       }: { 
         choreId: string; 
         userId: string 
-      }
-    ) => {
+      },
+      
+      context: AuthContext) => { 
+
+        if (!context.user) {
+          throw new Error ('Must be logged in')
+        }
+
       const updatedChore = await Chore.findByIdAndUpdate(
         choreId, 
         { assignedTo: userId }, 
@@ -150,8 +194,12 @@ const resolvers = {
         assignedTo?: string;
         repeatEvery?: number;
         lastCompleted?: string;
-      }
+      },
+      context: AuthContext
     ) => {
+      if (!context.user) {
+        throw new Error ('Must be logged in');
+      } 
       const updates: any = {};
       if (title !== undefined) updates.title = title;
       if (description !== undefined) updates.description = description;
@@ -171,29 +219,40 @@ const resolvers = {
 
     deleteChore: async (
       _: any,
-      { choreId }: { choreId: string }
+      { choreId }: { choreId: string },
+      context: AuthContext
     ) => {
+      if (!context.user) {
+        throw new Error ('Must be logged in');
+      }
+
       const deletedChore = await Chore.findByIdAndDelete(choreId);
-      if (deletedChore) {
+      
+      if (!deletedChore) {
+        throw new Error ('Chore not found');
+      }
+      
         await Household.findByIdAndUpdate(deletedChore.household, { 
           $pull: { chores: choreId },
         });
+
       if (deletedChore.assignedTo) {
         await User.findByIdAndUpdate(deletedChore.assignedTo, { 
           $pull: { chores: choreId },
         });
-      }}
-      else {
-        throw new Error('Chore not found');
-      };
+      }
       
       return deletedChore;
     },
 
     unassignChore: async (
       _: any,
-      { choreId }: { choreId: string }
+      { choreId }: { choreId: string },
+      context: AuthContext
       ) => {
+ if (!context.user) {
+    throw new Error ('Must be logged in');
+  }
 
         const chore = await Chore.findById(choreId);
 
