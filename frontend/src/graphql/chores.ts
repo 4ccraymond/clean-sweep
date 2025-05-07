@@ -93,3 +93,12 @@ export const ADD_CHORE = gql`
     }
   }
 `;
+
+export const GET_USERS = gql`
+  query {
+    users {
+      _id
+      username
+    }
+  }
+`;

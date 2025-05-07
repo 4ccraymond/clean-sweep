@@ -31,7 +31,12 @@ export const signup = async (req: Request, res: Response) => {
       $push: { members: user._id },
     });
 
-    const token = generateToken(user._id.toString());
+    const token = generateToken({
+      _id: user._id.toString(),
+      email: user.email!,
+      username: user.username,
+      household: user.household?._id?.toString?.() || user.household?.toString?.(),
+    });
 
     const fullUser = await User.findById(user._id).populate('household');
 
@@ -60,7 +65,12 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ msg: 'Invalid Credentials' });
     }
 
-    const token = generateToken(user._id.toString());
+    const token = generateToken({
+      _id: user._id.toString(),
+      email: user.email!,
+      username: user.username,
+      household: user.household?._id?.toString?.() || user.household?.toString?.(),
+    });
 
     res.json({ token, user });
   } catch (error) {
