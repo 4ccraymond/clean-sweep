@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
-import { ADD_CHORE, GET_CHORES } from '../../graphql/chores';
+import { ADD_CHORE, GET_CHORES, GET_USERS } from '../../graphql/chores';
 
 const FormContainer = styled.div`
   display: flex;
@@ -50,6 +50,8 @@ export default function ChoreForm() {
 
   const householdId = localStorage.getItem('household'); // Stored at signup/login
 
+  const { data: userData, loading: usersLoading, error: usersError } = useQuery(GET_USERS);
+
   const [addChore] = useMutation(ADD_CHORE, {
     refetchQueries: [{ query: GET_CHORES }],
   });
@@ -77,6 +79,9 @@ export default function ChoreForm() {
     }
   };
 
+  if (usersLoading) return <p>Loading users...</p>;
+  if (usersError) return <p>Error loading users</p>;
+
   return (
     <FormContainer>
       <Form onSubmit={handleSubmit}>
@@ -88,12 +93,19 @@ export default function ChoreForm() {
           onChange={e => setTitle(e.target.value)}
           required
         />
-        <Input
-          type="text"
-          placeholder="Assigned to (User ID)"
+        <label>Assign To:</label>
+        <select
           value={assignedTo}
           onChange={e => setAssignedTo(e.target.value)}
-        />
+          style={{ marginBottom: '1rem', padding: '0.8rem', borderRadius: '8px', width: '100%' }}
+        >
+          <option value="">-- Unassigned --</option>
+          {userData?.users.map((user: any) => (
+            <option key={user._id} value={user._id}>
+              {user.username}
+            </option>
+          ))}
+        </select>
         <Input
           type="text"
           placeholder="Description (optional)"
