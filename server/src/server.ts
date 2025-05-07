@@ -5,10 +5,15 @@ import dotenv from 'dotenv';
 import path from 'path';
 import cors from 'cors';
 
-import { typeDefs, resolvers } from './schemas';
-import db from './config/connection';
-import { authMiddleware } from './utils/auth';
-import authRoutes from './routes/authRoutes';
+import { typeDefs, resolvers } from './schemas/index.js';
+import db from './config/connection.js';
+import { authMiddleware } from './utils/auth.js';
+import authRoutes from './routes/authRoutes.js';
+import type { Request, Response } from 'express';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+    
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 dotenv.config();
@@ -29,9 +34,9 @@ const startServer = async () => {
     credentials: true,
   }));
 
-  app.get('/', (_req, res) => {
-    res.send('Welcome to the Clean Sweep API! Use /graphql for POST requests.');
-  });
+  // app.get('/', (_req, res) => {
+  //   res.send('Welcome to the Clean Sweep API! Use /graphql for POST requests.');
+  // });
 
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
@@ -44,6 +49,11 @@ const startServer = async () => {
       context: async ({ req }) => authMiddleware({ req }),
     })
   );
+
+  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+    app.get('*', (_req: Request, res: Response) => {
+      res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+    });
 
   db.once('open', () => {
     app.listen(PORT, () =>
