@@ -19,5 +19,6 @@
     "paths": {
       "@/*": ["CLEAN-SWEEP/*"]
     }
-  }
+  },
+  "include": ["src"]
 }
