@@ -46,6 +46,8 @@ export default function ChoreForm() {
   const [title, setTitle] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [description, setDescription] = useState('');
+  const [repeatEvery, setRepeatEvery] = useState('');
+
   const navigate = useNavigate();
 
   const householdId = localStorage.getItem('household'); // Stored at signup/login
@@ -71,8 +73,9 @@ export default function ChoreForm() {
           household: householdId,
           assignedTo: assignedTo || undefined,
           description: description || undefined,
+          repeatEvery: repeatEvery ? parseInt(repeatEvery) : undefined,
         },
-      });
+      });      
       navigate('/dashboard');
     } catch (err) {
       console.error('Error adding chore:', err);
@@ -106,6 +109,13 @@ export default function ChoreForm() {
             </option>
           ))}
         </select>
+        <Input
+          type="number"
+          placeholder="Repeat every N days (optional)"
+          value={repeatEvery}
+          onChange={e => setRepeatEvery(e.target.value)}
+          min="1"
+        />
         <Input
           type="text"
           placeholder="Description (optional)"

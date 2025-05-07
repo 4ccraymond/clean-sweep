@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import User from '../models/User';
-import Household from '../models/Household';
-import generateToken from '../utils/generateToken';
+import User from '../models/User.js';
+import Household from '../models/Household.js';
+import generateToken from '../utils/generateToken.js';
 
 export const signup = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;

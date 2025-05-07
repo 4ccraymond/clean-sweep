@@ -1,9 +1,9 @@
-import User, {IUser} from '../models/User';
-import Chore, {IChore} from '../models/Chore';
-import Household, {IHousehold} from '../models/Household';
+import User, {IUser} from '../models/User.js';
+import Chore, {IChore} from '../models/Chore.js';
+import Household, {IHousehold} from '../models/Household.js';
 import { join } from 'path';
 import mongoose, { Types } from 'mongoose';
-import { AuthContext, signToken } from '../utils/auth';
+import { AuthContext, signToken } from '../utils/auth.js';
 
 const resolvers = {
   Query: {
@@ -40,9 +40,9 @@ const resolvers = {
       return Chore.find({ household: context.user.household }).populate('assignedTo');
     },
 
-    households: async (parent: any, _: any, context: AuthContext) => {
-      if (!context.user) throw new Error ('Must be logged in');
-      return Household.find({ _id: context.user.household });
+    households: async (_: any, __: any, context: AuthContext) => {
+      if (!context.user) throw new Error('Must be logged in');
+      return Household.find({});
     },
 
     household: async (_: any, {id}: { id: string }, context: AuthContext) => {
