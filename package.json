@@ -10,7 +10,10 @@
   ],
   "scripts": {
     "build": "npm run build --workspace frontend && npm run build --workspace server",
+    "render-build": "cd server && npm run build && cd ../frontend && npm run build",
+    "render-install": "cd server && npm install && cd ../frontend && npm install",
     "start": "npm run start --workspace server",
+    "render": "cd server && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
