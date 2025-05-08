@@ -89,6 +89,13 @@ export default function Login() {
           required
         />
         <Button type="submit">Login</Button>
+        <Button
+          type="button"
+          onClick={() => navigate('/signup')}
+          style={{ marginTop: '0.5rem', background: '#666' }}
+        >
+          New user? Sign up
+        </Button>
       </Form>
     </Container>
   );

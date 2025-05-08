@@ -102,3 +102,44 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const GET_CHORE = gql`
+  query GetChore($id: ID!) {
+    chore(id: $id) {
+      _id
+      title
+      description
+      completed
+      repeatEvery
+      assignedTo {
+        _id
+        username
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHORE = gql`
+  mutation UpdateChore(
+    $choreId: ID!
+    $title: String
+    $description: String
+    $completed: Boolean
+    $assignedTo: ID
+    $repeatEvery: Int
+  ) {
+    updateChore(
+      choreId: $choreId
+      title: $title
+      description: $description
+      completed: $completed
+      assignedTo: $assignedTo
+      repeatEvery: $repeatEvery
+    ) {
+      _id
+      title
+      description
+      completed
+    }
+  }
+`;
