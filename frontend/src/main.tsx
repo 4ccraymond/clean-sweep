@@ -17,6 +17,7 @@ import Signup from './pages/Signup/Signup';
 import { GlobalStyle, theme } from './styles/globalStyles';
 import ChoreForm from './pages/ChoreForm/ChoreForm';
 import JoinHousehold from './pages/JoinHousehold/JoinHousehold';
+import EditChore from './pages/EditChore/EditChore';
 
 // Apollo setup with dynamic token injection
 const httpLink = createHttpLink({
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       { path: '/dashboard', element: <Dashboard /> },
       { path: '/chore-form', element: <ChoreForm /> },
       { path: '/join-household', element: <JoinHousehold /> },
+      { path: '/edit-chore/:id', element: <EditChore /> },
     ],
   },
 ]);

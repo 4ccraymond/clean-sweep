@@ -110,7 +110,7 @@ export default function Dashboard() {
                 <Button onClick={() => handleUnassign(chore._id)}>🚫 Unassign</Button>
               )}
               <Button onClick={() => handleDelete(chore._id)}>🗑️ Delete</Button>
-              <Button onClick={() => console.log('Edit chore clicked')}>✏️ Edit</Button>
+              <Button onClick={() => navigate(`/edit-chore/${chore._id}`)}>✏️ Edit</Button>
             </div>
           </ChoreItem>
         ))}
